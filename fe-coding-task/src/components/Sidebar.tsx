@@ -8,7 +8,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import { SavedStatItem } from "../common/types";
 
-const drawerWidth = 240;
+const sidebarWidth = 240;
 
 type SidebarProps = {
     items: SavedStatItem[];
@@ -16,13 +16,13 @@ type SidebarProps = {
 };
 
 export function Sidebar({ items, onSavedStatsClick }: SidebarProps) {
-    const [mobileOpen, setMobileOpen] = useState(false);
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-    function handleDrawerToggle() {
-        setMobileOpen(!mobileOpen);
+    function handleSidebarToggle() {
+        setIsMobileOpen(!isMobileOpen);
     }
 
-    const drawer = (
+    const sidebarContent = (
         <div>
             <List>
                 {items.length > 0 ? (
@@ -51,13 +51,13 @@ export function Sidebar({ items, onSavedStatsClick }: SidebarProps) {
         <Box sx={{ display: "flex" }}>
             <Box
                 component="nav"
-                sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-                aria-label="Saves stats"
+                sx={{ width: { sm: sidebarWidth }, flexShrink: { sm: 0 } }}
+                aria-label="Saved stats"
             >
                 <Drawer
                     variant="temporary"
-                    open={mobileOpen}
-                    onClose={handleDrawerToggle}
+                    open={isMobileOpen}
+                    onClose={handleSidebarToggle}
                     ModalProps={{
                         keepMounted: true,
                     }}
@@ -65,11 +65,11 @@ export function Sidebar({ items, onSavedStatsClick }: SidebarProps) {
                         display: { xs: "block", sm: "none" },
                         "& .MuiDrawer-paper": {
                             boxSizing: "border-box",
-                            width: drawerWidth,
+                            width: sidebarWidth,
                         },
                     }}
                 >
-                    {drawer}
+                    {sidebarContent}
                 </Drawer>
                 <Drawer
                     variant="permanent"
@@ -77,12 +77,12 @@ export function Sidebar({ items, onSavedStatsClick }: SidebarProps) {
                         display: { xs: "none", sm: "block" },
                         "& .MuiDrawer-paper": {
                             boxSizing: "border-box",
-                            width: drawerWidth,
+                            width: sidebarWidth,
                         },
                     }}
                     open
                 >
-                    {drawer}
+                    {sidebarContent}
                 </Drawer>
             </Box>
             <Box
@@ -90,10 +90,10 @@ export function Sidebar({ items, onSavedStatsClick }: SidebarProps) {
                     flexGrow: 1,
                     p: 3,
                     display: { sm: "none" },
-                    width: { sm: `calc(100% - ${drawerWidth}px)` },
+                    width: { sm: `calc(100% - ${sidebarWidth}px)` },
                 }}
             >
-                <Button aria-label="Open sidebar" onClick={handleDrawerToggle}>
+                <Button aria-label="Open sidebar" onClick={handleSidebarToggle}>
                     Show saved stats
                 </Button>
             </Box>
