@@ -15,19 +15,14 @@ import {
     Select,
     TextField,
 } from "@mui/material";
-import { useEffect, useState } from "react";
-import { getFormFieldsData } from "../utils/api";
 
 type FormProps = {
     onFormSubmit: SubmitHandler<FormFields>;
+    formFieldsData: FormFieldsData | null;
+    isLoading: boolean;
 };
 
-export function Form({ onFormSubmit }: FormProps) {
-    const [formFieldsData, setFormFieldsData] = useState<FormFieldsData | null>(
-        null,
-    );
-    const [isLoading, setIsLoading] = useState(true);
-
+export function Form({ onFormSubmit, formFieldsData, isLoading }: FormProps) {
     const {
         control,
         formState: { errors },
@@ -39,19 +34,6 @@ export function Form({ onFormSubmit }: FormProps) {
             houseTypes: [],
         },
     });
-
-    useEffect(() => {
-        getFormFieldsData()
-            .then((data) => {
-                setFormFieldsData(data);
-            })
-            .catch((error) => {
-                console.error(error);
-            })
-            .finally(() => {
-                setIsLoading(false);
-            });
-    }, []);
 
     if (isLoading) {
         return <CircularProgress />;

@@ -3,9 +3,11 @@ import { Form } from "./components/Form";
 import { Sidebar } from "./components/Sidebar";
 import { Comment } from "./components/Comment";
 import CssBaseline from "@mui/material/CssBaseline";
-import { FormFields, SavedStatItem } from "./common/types";
+import { FormFields, FormFieldsData, SavedStatItem } from "./common/types";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { Box } from "@mui/system";
+import { useEffect, useState } from "react";
+import { getFormFieldsData } from "./utils/api";
 
 const darkTheme = createTheme({
     palette: {
@@ -92,6 +94,24 @@ export default function App() {
         { key: "baa", name: "Baa" },
     ];
 
+    const [isLoading, setIsLoading] = useState(true);
+    const [formFieldsData, setFormFieldsData] = useState<FormFieldsData | null>(
+        null,
+    );
+
+    useEffect(() => {
+        getFormFieldsData()
+            .then((data) => {
+                setFormFieldsData(data);
+            })
+            .catch((error) => {
+                console.error(error);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
+    }, []);
+
     // TODO: secure from race conditions
     // https://react.dev/reference/react/useEffect#fetching-data-with-effects
     function handleSavedStatsClick(key: string) {
@@ -118,7 +138,11 @@ export default function App() {
                         width: { sm: `calc(100% - ${sidebarWidth}px)` },
                     }}
                 >
-                    <Form onFormSubmit={handleFormSubmit} />
+                    <Form
+                        onFormSubmit={handleFormSubmit}
+                        formFieldsData={formFieldsData}
+                        isLoading={isLoading}
+                    />
                     <Box display="flex" justifyContent="center" mt={4}>
                         <Chart data={data} xData={quarters} isLoading={false} />
                     </Box>
