@@ -1,14 +1,17 @@
-import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import { useForm, Controller, SubmitHandler, Validate } from "react-hook-form";
 import { FormFields, FormFieldsData } from "../common/types";
 import {
     Alert,
     Autocomplete,
+    Box,
     Button,
     CircularProgress,
     FormControl,
     FormHelperText,
+    Grid,
     InputLabel,
     MenuItem,
+    Paper,
     Select,
     TextField,
 } from "@mui/material";
@@ -65,142 +68,185 @@ export function Form({ onFormSubmit }: FormProps) {
     const isQuartersSelectIncorrect =
         !!errors.startQuarter || !!errors.endQuarter;
 
+    const validateStartQuarter: Validate<string, FormFields> = (
+        startQuarter,
+        { endQuarter },
+    ) => {
+        if (
+            formFieldsData === null ||
+            startQuarter === "" ||
+            endQuarter === ""
+        ) {
+            return true;
+        }
+
+        return (
+            formFieldsData.quarters.findIndex(
+                ({ value }) => value === endQuarter,
+            ) >=
+            formFieldsData.quarters.findIndex(
+                ({ value }) => value === startQuarter,
+            )
+        );
+    };
+
+    const validateEndQuarter: Validate<string, FormFields> = (
+        endQuarter,
+        { startQuarter },
+    ) => {
+        if (
+            formFieldsData === null ||
+            endQuarter === "" ||
+            startQuarter === ""
+        ) {
+            return true;
+        }
+
+        return (
+            formFieldsData.quarters.findIndex(
+                ({ value }) => value === endQuarter,
+            ) >=
+            formFieldsData.quarters.findIndex(
+                ({ value }) => value === startQuarter,
+            )
+        );
+    };
+
     return (
-        <form onSubmit={handleSubmit(onFormSubmit)}>
-            <Controller
-                name="startQuarter"
-                control={control}
-                rules={{
-                    validate: (startQuarter, { endQuarter }) => {
-                        if (
-                            formFieldsData === null ||
-                            startQuarter === "" ||
-                            endQuarter === ""
-                        ) {
-                            return true;
-                        }
+        <Paper variant="outlined" sx={{ p: { xs: 2, sm: 3 } }}>
+            <form onSubmit={handleSubmit(onFormSubmit)}>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} sm={6}>
+                        <Controller
+                            name="startQuarter"
+                            control={control}
+                            rules={{
+                                validate: validateStartQuarter,
+                            }}
+                            render={({ field }) => (
+                                <FormControl
+                                    error={isQuartersSelectIncorrect}
+                                    fullWidth
+                                >
+                                    <InputLabel id="start-quarter-select">
+                                        Start quarter
+                                    </InputLabel>
+                                    <Select
+                                        labelId="start-quarter-select"
+                                        label="Start quarter select"
+                                        {...field}
+                                    >
+                                        {formFieldsData?.quarters.map(
+                                            ({ name, value }) => (
+                                                <MenuItem
+                                                    key={value}
+                                                    value={value}
+                                                >
+                                                    {name}
+                                                </MenuItem>
+                                            ),
+                                        )}
+                                    </Select>
+                                    {isQuartersSelectIncorrect && (
+                                        <FormHelperText>
+                                            Incorrect quarters pick order
+                                        </FormHelperText>
+                                    )}
+                                </FormControl>
+                            )}
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <Controller
+                            name="endQuarter"
+                            control={control}
+                            rules={{
+                                validate: validateEndQuarter,
+                            }}
+                            render={({ field }) => (
+                                <FormControl
+                                    error={isQuartersSelectIncorrect}
+                                    fullWidth
+                                >
+                                    <InputLabel id="end-quarter-select">
+                                        End quarter
+                                    </InputLabel>
+                                    <Select
+                                        labelId="end-quarter-select"
+                                        label="End quarter select"
+                                        {...field}
+                                    >
+                                        {formFieldsData?.quarters.map(
+                                            ({ name, value }) => (
+                                                <MenuItem
+                                                    key={value}
+                                                    value={value}
+                                                >
+                                                    {name}
+                                                </MenuItem>
+                                            ),
+                                        )}
+                                    </Select>
+                                    {isQuartersSelectIncorrect && (
+                                        <FormHelperText>
+                                            Incorrect quarters pick order
+                                        </FormHelperText>
+                                    )}
+                                </FormControl>
+                            )}
+                        />
+                    </Grid>
 
-                        return (
-                            formFieldsData.quarters.findIndex(
-                                ({ value }) => value === endQuarter,
-                            ) >=
-                            formFieldsData.quarters.findIndex(
-                                ({ value }) => value === startQuarter,
-                            )
-                        );
-                    },
-                }}
-                render={({ field }) => (
-                    <FormControl error={isQuartersSelectIncorrect}>
-                        <InputLabel id="start-quarter-select">
-                            Start quarter
-                        </InputLabel>
-                        <Select
-                            labelId="start-quarter-select"
-                            label="Start quarter select"
-                            {...field}
-                        >
-                            {formFieldsData?.quarters.map(({ name, value }) => (
-                                <MenuItem key={value} value={value}>
-                                    {name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                        {isQuartersSelectIncorrect && (
-                            <FormHelperText>
-                                Incorrect quarters pick order
-                            </FormHelperText>
-                        )}
-                    </FormControl>
-                )}
-            />
-            <Controller
-                name="endQuarter"
-                control={control}
-                rules={{
-                    validate: (endQuarter, { startQuarter }) => {
-                        if (
-                            formFieldsData === null ||
-                            endQuarter === "" ||
-                            startQuarter === ""
-                        ) {
-                            return true;
-                        }
-
-                        return (
-                            formFieldsData.quarters.findIndex(
-                                ({ value }) => value === endQuarter,
-                            ) >=
-                            formFieldsData.quarters.findIndex(
-                                ({ value }) => value === startQuarter,
-                            )
-                        );
-                    },
-                }}
-                render={({ field }) => (
-                    <FormControl error={isQuartersSelectIncorrect}>
-                        <InputLabel id="end-quarter-select">
-                            End quarter
-                        </InputLabel>
-                        <Select
-                            labelId="end-quarter-select"
-                            label="End quarter select"
-                            {...field}
-                        >
-                            {formFieldsData?.quarters.map(({ name, value }) => (
-                                <MenuItem key={value} value={value}>
-                                    {name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                        {isQuartersSelectIncorrect && (
-                            <FormHelperText>
-                                Incorrect quarters pick order
-                            </FormHelperText>
-                        )}
-                    </FormControl>
-                )}
-            />
-
-            {/* https://codesandbox.io/s/mui-autocomplete-result-u65kf2?file=/src/RHFAutocompleteField.tsx */}
-            <Controller
-                name="houseTypes"
-                control={control}
-                render={({ field, fieldState: { error } }) => {
-                    const { onChange, value, ref } = field;
-                    return (
-                        <>
-                            <Autocomplete
-                                multiple
-                                value={value}
-                                getOptionLabel={({ name }) => name}
-                                onChange={(_, newValue) => {
-                                    onChange(newValue ? newValue : null);
-                                }}
-                                id="controllable-states-demo"
-                                options={formFieldsData?.houseTypes ?? []}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        label="House types"
-                                        placeholder="House types"
-                                        inputRef={ref}
-                                    />
-                                )}
-                            />
-                            {error ? (
-                                <span style={{ color: "red" }}>
-                                    {error.message}
-                                </span>
-                            ) : null}
-                        </>
-                    );
-                }}
-            />
-
-            <Button variant="contained" type="submit">
-                Submit
-            </Button>
-        </form>
+                    <Grid item xs={12}>
+                        <Controller
+                            name="houseTypes"
+                            control={control}
+                            render={({
+                                field: { onChange, ref },
+                                fieldState: { error },
+                            }) => {
+                                return (
+                                    <>
+                                        <Autocomplete
+                                            multiple
+                                            getOptionLabel={({ name }) => name}
+                                            onChange={(_, newValue) => {
+                                                onChange(
+                                                    newValue ? newValue : null,
+                                                );
+                                            }}
+                                            id="controllable-states-demo"
+                                            options={
+                                                formFieldsData?.houseTypes ?? []
+                                            }
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    label="House types"
+                                                    placeholder="House types"
+                                                    inputRef={ref}
+                                                />
+                                            )}
+                                        />
+                                        {error && (
+                                            <FormHelperText>
+                                                {error.message}
+                                            </FormHelperText>
+                                        )}
+                                    </>
+                                );
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Box display="flex" justifyContent="center">
+                            <Button variant="contained" type="submit">
+                                Submit
+                            </Button>
+                        </Box>
+                    </Grid>
+                </Grid>
+            </form>
+        </Paper>
     );
 }
