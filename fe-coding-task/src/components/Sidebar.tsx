@@ -8,14 +8,17 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import { SavedStatItem } from "../common/types";
 
-const sidebarWidth = 240;
-
 type SidebarProps = {
+    sidebarWidth: number;
     items: SavedStatItem[];
     onSavedStatsClick: (key: string) => void;
 };
 
-export function Sidebar({ items, onSavedStatsClick }: SidebarProps) {
+export function Sidebar({
+    sidebarWidth,
+    items,
+    onSavedStatsClick,
+}: SidebarProps) {
     const [isMobileOpen, setIsMobileOpen] = useState(false);
 
     function handleSidebarToggle() {
@@ -48,12 +51,8 @@ export function Sidebar({ items, onSavedStatsClick }: SidebarProps) {
     );
 
     return (
-        <Box sx={{ display: "flex" }}>
-            <Box
-                component="nav"
-                sx={{ width: { sm: sidebarWidth }, flexShrink: { sm: 0 } }}
-                aria-label="Saved stats"
-            >
+        <Box sx={{ width: { sm: sidebarWidth } }}>
+            <Box component="nav" aria-label="Saved stats">
                 <Drawer
                     variant="temporary"
                     open={isMobileOpen}
@@ -87,13 +86,15 @@ export function Sidebar({ items, onSavedStatsClick }: SidebarProps) {
             </Box>
             <Box
                 sx={{
-                    flexGrow: 1,
                     p: 3,
                     display: { sm: "none" },
-                    width: { sm: `calc(100% - ${sidebarWidth}px)` },
                 }}
             >
-                <Button aria-label="Open sidebar" onClick={handleSidebarToggle}>
+                <Button
+                    variant="outlined"
+                    aria-label="Open sidebar"
+                    onClick={handleSidebarToggle}
+                >
                     Show saved stats
                 </Button>
             </Box>
