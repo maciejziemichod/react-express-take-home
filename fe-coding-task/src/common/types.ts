@@ -1,8 +1,3 @@
-export type SavedStatItem = {
-    key: string;
-    name: string;
-};
-
 export type FormFields = {
     startQuarter: string;
     endQuarter: string;
@@ -18,4 +13,13 @@ export type FormFieldsData = {
         name: string;
         value: string;
     }>;
+};
+
+export type CommentedStatsMap = {
+    [key: string]: {
+        comment: string;
+        data: number[];
+        quarters: string[];
+        houseType: string;
+    };
 };

@@ -3,13 +3,18 @@ import { Form } from "./components/Form";
 import { Sidebar } from "./components/Sidebar";
 import { Comment } from "./components/Comment";
 import CssBaseline from "@mui/material/CssBaseline";
-import { FormFields, FormFieldsData, SavedStatItem } from "./common/types";
+import { CommentedStatsMap, FormFields, FormFieldsData } from "./common/types";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import { getFormFieldsData, queryData } from "./utils/api";
-import { getParams, updateParams } from "./utils/url";
+import { getParams, getRawParams, updateParams } from "./utils/url";
 import { getQuartersRange } from "./utils/quarters";
+import {
+    getCommentedStats,
+    removeCommentedStat,
+    saveCommentedStats,
+} from "./utils/localStorage";
 
 const darkTheme = createTheme({
     palette: {
@@ -29,8 +34,19 @@ export default function App() {
     >(undefined);
     const [priceData, setPriceData] = useState<number[]>([]);
     const [quartersData, setQuartersData] = useState<string[]>([]);
+    const [comment, setComment] = useState("");
+    const [savedStats, setSavedStats] = useState<CommentedStatsMap>({});
 
     useEffect(() => {
+        const localSavedStats = getCommentedStats();
+        const rawParams = getRawParams();
+
+        setSavedStats(localSavedStats);
+
+        if (rawParams in localSavedStats) {
+            setComment(localSavedStats[rawParams].comment);
+        }
+
         getFormFieldsData()
             .then((data) => {
                 setFormFieldsData(data);
@@ -61,10 +77,6 @@ export default function App() {
             });
     }, []);
 
-    function handleSavedStatsClick(key: string) {
-        console.log(key);
-    }
-
     function handleFormSubmit({
         startQuarter,
         endQuarter,
@@ -75,6 +87,10 @@ export default function App() {
             endQuarter: endQuarter,
             houseType: houseType,
         });
+
+        if (!(getRawParams() in savedStats)) {
+            setComment("");
+        }
 
         if (formFieldsData === null) {
             return;
@@ -98,13 +114,65 @@ export default function App() {
             .catch(console.error);
     }
 
+    function handleCommentChange(
+        event: React.ChangeEvent<HTMLTextAreaElement>,
+    ): void {
+        const value = event.target.value;
+
+        setComment(value);
+
+        const params = getRawParams();
+
+        if (params === "") {
+            return;
+        }
+
+        if (value === "") {
+            const newSavedStats = removeCommentedStat(params);
+            setSavedStats(newSavedStats);
+            return;
+        }
+
+        const { houseType } = getParams();
+
+        const newSavedStats = saveCommentedStats(
+            params,
+            comment,
+            priceData,
+            quartersData,
+            houseType ? houseType : "",
+        );
+
+        setSavedStats(newSavedStats);
+    }
+
+    function handleSavedStatsClick(key: string) {
+        if (!(key in savedStats)) {
+            removeCommentedStat(key);
+            return;
+        }
+
+        const { comment, data, quarters, houseType } = savedStats[key];
+        const newFormData = {
+            startQuarter: quarters[0],
+            endQuarter: quarters[quarters.length - 1],
+            houseType: houseType,
+        };
+
+        setFormFieldsValues(newFormData);
+        updateParams(newFormData);
+        setComment(comment);
+        setPriceData(data);
+        setQuartersData(quarters);
+    }
+
     return (
         <ThemeProvider theme={darkTheme}>
             <CssBaseline />
             <Box component="main" sx={{ display: { xs: "block", sm: "flex" } }}>
                 <Sidebar
                     sidebarWidth={sidebarWidth}
-                    items={[]}
+                    map={savedStats}
                     onSavedStatsClick={handleSavedStatsClick}
                 />
                 <Box
@@ -127,7 +195,11 @@ export default function App() {
                             isLoading={false}
                         />
                     </Box>
-                    <Comment />
+                    <Comment
+                        show={priceData.length > 0}
+                        value={comment}
+                        onCommentChange={handleCommentChange}
+                    />
                 </Box>
             </Box>
         </ThemeProvider>

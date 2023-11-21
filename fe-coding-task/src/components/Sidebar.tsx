@@ -6,18 +6,18 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
-import { SavedStatItem } from "../common/types";
+import { CommentedStatsMap } from "../common/types";
 import { Typography } from "@mui/material";
 
 type SidebarProps = {
     sidebarWidth: number;
-    items: SavedStatItem[];
+    map: CommentedStatsMap;
     onSavedStatsClick: (key: string) => void;
 };
 
 export function Sidebar({
     sidebarWidth,
-    items,
+    map,
     onSavedStatsClick,
 }: SidebarProps) {
     const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -26,16 +26,18 @@ export function Sidebar({
         setIsMobileOpen(!isMobileOpen);
     }
 
+    const items = Object.entries(map);
+
     const sidebarContent = (
         <div>
             <List>
                 {items.length > 0 ? (
-                    items.map(({ key, name }) => (
+                    items.map(([key, { comment }]) => (
                         <ListItem key={key} disablePadding>
                             <ListItemButton
                                 onClick={() => onSavedStatsClick(key)}
                             >
-                                <ListItemText primary={name} />
+                                <Typography noWrap={true}>{comment}</Typography>
                             </ListItemButton>
                         </ListItem>
                     ))
