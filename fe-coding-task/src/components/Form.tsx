@@ -20,14 +20,21 @@ type FormProps = {
     onFormSubmit: SubmitHandler<FormFields>;
     formFieldsData: FormFieldsData | null;
     isLoading: boolean;
+    values?: FormFields;
 };
 
-export function Form({ onFormSubmit, formFieldsData, isLoading }: FormProps) {
+export function Form({
+    onFormSubmit,
+    formFieldsData,
+    isLoading,
+    values,
+}: FormProps) {
     const {
         control,
         formState: { errors },
         handleSubmit,
     } = useForm<FormFields>({
+        values,
         defaultValues: {
             startQuarter: "",
             endQuarter: "",
@@ -184,13 +191,21 @@ export function Form({ onFormSubmit, formFieldsData, isLoading }: FormProps) {
                             name="houseTypes"
                             control={control}
                             render={({
-                                field: { onChange, ref },
+                                field: { onChange, value, ref },
                                 fieldState: { error },
                             }) => {
                                 return (
                                     <>
                                         <Autocomplete
                                             multiple
+                                            value={value}
+                                            isOptionEqualToValue={(
+                                                option,
+                                                value,
+                                            ) =>
+                                                option.name === value.name &&
+                                                option.value === value.value
+                                            }
                                             getOptionLabel={({ name }) => name}
                                             onChange={(_, newValue) => {
                                                 onChange(

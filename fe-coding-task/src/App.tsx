@@ -3,11 +3,17 @@ import { Form } from "./components/Form";
 import { Sidebar } from "./components/Sidebar";
 import { Comment } from "./components/Comment";
 import CssBaseline from "@mui/material/CssBaseline";
-import { FormFields, FormFieldsData, SavedStatItem } from "./common/types";
+import {
+    FormFields,
+    FormFieldsData,
+    HouseType,
+    SavedStatItem,
+} from "./common/types";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import { getFormFieldsData } from "./utils/api";
+import { getParams, updateParams } from "./utils/url";
 
 const darkTheme = createTheme({
     palette: {
@@ -36,6 +42,9 @@ export default function App() {
     const [formFieldsData, setFormFieldsData] = useState<FormFieldsData | null>(
         null,
     );
+    const [formFieldsValues, setFormFieldsValues] = useState<
+        FormFields | undefined
+    >(undefined);
     const [priceData, setPriceData] = useState<number[]>([]);
 
     useEffect(() => {
@@ -43,6 +52,20 @@ export default function App() {
             .then((data) => {
                 setFormFieldsData(data);
                 setPriceData(dPricedata);
+                const { startQuarter, endQuarter, houseTypes } = getParams();
+
+                setFormFieldsValues({
+                    startQuarter: startQuarter ? startQuarter : "",
+                    endQuarter: endQuarter ? endQuarter : "",
+                    houseTypes: !houseTypes
+                        ? []
+                        : houseTypes.map(
+                              (type) =>
+                                  data.houseTypes.find(
+                                      ({ value }) => value === type,
+                                  ) as HouseType,
+                          ),
+                });
             })
             .catch((error) => {
                 console.error(error);
@@ -64,7 +87,11 @@ export default function App() {
     }
 
     function handleFormSubmit(data: FormFields) {
-        console.log(data);
+        updateParams({
+            startQuarter: data.startQuarter,
+            endQuarter: data.endQuarter,
+            houseTypes: data.houseTypes.map(({ value }) => value),
+        });
     }
 
     return (
@@ -87,6 +114,7 @@ export default function App() {
                         onFormSubmit={handleFormSubmit}
                         formFieldsData={formFieldsData}
                         isLoading={isLoading}
+                        values={formFieldsValues}
                     />
                     <Box display="flex" justifyContent="center" mt={4}>
                         <Chart

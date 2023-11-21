@@ -3,7 +3,7 @@ export type SavedStatItem = {
     name: string;
 };
 
-type HouseType = {
+export type HouseType = {
     name: string;
     value: string;
 };
