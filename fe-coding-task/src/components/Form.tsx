@@ -109,6 +109,7 @@ export function Form({
                             control={control}
                             rules={{
                                 validate: validateStartQuarter,
+                                required: true,
                             }}
                             render={({ field }) => (
                                 <FormControl
@@ -149,6 +150,7 @@ export function Form({
                             control={control}
                             rules={{
                                 validate: validateEndQuarter,
+                                required: true,
                             }}
                             render={({ field }) => (
                                 <FormControl
@@ -188,8 +190,12 @@ export function Form({
                         <Controller
                             name="houseType"
                             control={control}
+                            rules={{ required: true }}
                             render={({ field }) => (
-                                <FormControl fullWidth>
+                                <FormControl
+                                    fullWidth
+                                    error={!!errors.houseType}
+                                >
                                     <InputLabel id="house-type-select">
                                         House type
                                     </InputLabel>
@@ -209,6 +215,11 @@ export function Form({
                                             ),
                                         )}
                                     </Select>
+                                    {errors.houseType && (
+                                        <FormHelperText>
+                                            Pick a value
+                                        </FormHelperText>
+                                    )}
                                 </FormControl>
                             )}
                         />
