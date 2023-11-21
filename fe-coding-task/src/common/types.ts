@@ -3,15 +3,10 @@ export type SavedStatItem = {
     name: string;
 };
 
-export type HouseType = {
-    name: string;
-    value: string;
-};
-
 export type FormFields = {
     startQuarter: string;
     endQuarter: string;
-    houseTypes: HouseType[];
+    houseType: string;
 };
 
 export type FormFieldsData = {
@@ -19,5 +14,8 @@ export type FormFieldsData = {
         name: string;
         value: string;
     }>;
-    houseTypes: HouseType[];
+    houseTypes: Array<{
+        name: string;
+        value: string;
+    }>;
 };

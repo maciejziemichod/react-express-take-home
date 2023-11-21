@@ -68,12 +68,12 @@ type QueryItem = {
 };
 
 export async function queryData(
-    houseTypes: string[] = [],
+    houseType: string = "",
     quarters: string[] = [],
 ): Promise<number[]> {
     const query = [getQueryItem("ContentsCode", ["KvPris"])];
-    if (houseTypes.length > 0) {
-        query.push(getQueryItem("Boligtype", houseTypes));
+    if (houseType !== "") {
+        query.push(getQueryItem("Boligtype", [houseType]));
     }
     if (quarters.length > 0) {
         query.push(getQueryItem("Tid", quarters));

@@ -2,7 +2,6 @@ import { useForm, Controller, SubmitHandler, Validate } from "react-hook-form";
 import { FormFields, FormFieldsData } from "../common/types";
 import {
     Alert,
-    Autocomplete,
     Box,
     Button,
     CircularProgress,
@@ -13,7 +12,6 @@ import {
     MenuItem,
     Paper,
     Select,
-    TextField,
 } from "@mui/material";
 
 type FormProps = {
@@ -38,7 +36,7 @@ export function Form({
         defaultValues: {
             startQuarter: "",
             endQuarter: "",
-            houseTypes: [],
+            houseType: "",
         },
     });
 
@@ -188,51 +186,31 @@ export function Form({
 
                     <Grid item xs={12}>
                         <Controller
-                            name="houseTypes"
+                            name="houseType"
                             control={control}
-                            render={({
-                                field: { onChange, value, ref },
-                                fieldState: { error },
-                            }) => {
-                                return (
-                                    <>
-                                        <Autocomplete
-                                            multiple
-                                            value={value}
-                                            isOptionEqualToValue={(
-                                                option,
-                                                value,
-                                            ) =>
-                                                option.name === value.name &&
-                                                option.value === value.value
-                                            }
-                                            getOptionLabel={({ name }) => name}
-                                            onChange={(_, newValue) => {
-                                                onChange(
-                                                    newValue ? newValue : null,
-                                                );
-                                            }}
-                                            id="controllable-states-demo"
-                                            options={
-                                                formFieldsData?.houseTypes ?? []
-                                            }
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    label="House types"
-                                                    placeholder="House types"
-                                                    inputRef={ref}
-                                                />
-                                            )}
-                                        />
-                                        {error && (
-                                            <FormHelperText>
-                                                {error.message}
-                                            </FormHelperText>
+                            render={({ field }) => (
+                                <FormControl fullWidth>
+                                    <InputLabel id="house-type-select">
+                                        House type
+                                    </InputLabel>
+                                    <Select
+                                        labelId="house-type-select"
+                                        label="House type select"
+                                        {...field}
+                                    >
+                                        {formFieldsData?.houseTypes.map(
+                                            ({ name, value }) => (
+                                                <MenuItem
+                                                    key={value}
+                                                    value={value}
+                                                >
+                                                    {name}
+                                                </MenuItem>
+                                            ),
                                         )}
-                                    </>
-                                );
-                            }}
+                                    </Select>
+                                </FormControl>
+                            )}
                         />
                     </Grid>
                     <Grid item xs={12}>

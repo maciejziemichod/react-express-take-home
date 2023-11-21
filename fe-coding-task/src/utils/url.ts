@@ -1,18 +1,18 @@
 type Params = {
     startQuarter?: string;
     endQuarter?: string;
-    houseTypes?: string[];
+    houseType?: string;
 };
 
 export function updateParams({
-    houseTypes,
+    houseType,
     startQuarter,
     endQuarter,
 }: Params): void {
     const params = new URLSearchParams();
 
-    if (houseTypes && houseTypes.length > 0) {
-        params.set("house_types", houseTypes.join(","));
+    if (houseType) {
+        params.set("house_type", houseType);
     }
 
     if (startQuarter) {
@@ -38,12 +38,12 @@ export function getParams(): Params {
     const searchParams = new URLSearchParams(window.location.search);
     const params: Params = {};
 
-    const houseTypes = searchParams.get("house_types");
+    const houseTypes = searchParams.get("house_type");
     const startQuarter = searchParams.get("start_quarter");
     const endQuarter = searchParams.get("end_quarter");
 
     if (houseTypes) {
-        params.houseTypes = houseTypes.split(",");
+        params.houseType = houseTypes;
     }
     if (startQuarter) {
         params.startQuarter = startQuarter;

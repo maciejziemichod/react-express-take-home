@@ -1,4 +1,4 @@
-import { CircularProgress } from "@mui/material";
+import { Alert, CircularProgress } from "@mui/material";
 import { LineChart } from "@mui/x-charts";
 
 type ChartProps = {
@@ -8,8 +8,12 @@ type ChartProps = {
 };
 
 export function Chart({ xData, data, isLoading }: ChartProps) {
-    if (isLoading || xData.length === 0 || data.length === 0) {
+    if (isLoading) {
         return <CircularProgress />;
+    }
+
+    if (data.length === 0) {
+        return <Alert severity="info">Use form to display some data</Alert>;
     }
 
     return (

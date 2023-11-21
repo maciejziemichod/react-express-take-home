@@ -3,16 +3,11 @@ import { Form } from "./components/Form";
 import { Sidebar } from "./components/Sidebar";
 import { Comment } from "./components/Comment";
 import CssBaseline from "@mui/material/CssBaseline";
-import {
-    FormFields,
-    FormFieldsData,
-    HouseType,
-    SavedStatItem,
-} from "./common/types";
+import { FormFields, FormFieldsData, SavedStatItem } from "./common/types";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
-import { getFormFieldsData } from "./utils/api";
+import { getFormFieldsData, queryData } from "./utils/api";
 import { getParams, updateParams } from "./utils/url";
 
 const darkTheme = createTheme({
@@ -51,20 +46,12 @@ export default function App() {
         getFormFieldsData()
             .then((data) => {
                 setFormFieldsData(data);
-                setPriceData(dPricedata);
-                const { startQuarter, endQuarter, houseTypes } = getParams();
+                const { startQuarter, endQuarter, houseType } = getParams();
 
                 setFormFieldsValues({
                     startQuarter: startQuarter ? startQuarter : "",
                     endQuarter: endQuarter ? endQuarter : "",
-                    houseTypes: !houseTypes
-                        ? []
-                        : houseTypes.map(
-                              (type) =>
-                                  data.houseTypes.find(
-                                      ({ value }) => value === type,
-                                  ) as HouseType,
-                          ),
+                    houseType: houseType ? houseType : "",
                 });
             })
             .catch((error) => {
@@ -86,12 +73,20 @@ export default function App() {
         console.log(key);
     }
 
-    function handleFormSubmit(data: FormFields) {
+    function handleFormSubmit({
+        startQuarter,
+        endQuarter,
+        houseType,
+    }: FormFields) {
         updateParams({
-            startQuarter: data.startQuarter,
-            endQuarter: data.endQuarter,
-            houseTypes: data.houseTypes.map(({ value }) => value),
+            startQuarter: startQuarter,
+            endQuarter: endQuarter,
+            houseType: houseType,
         });
+
+        queryData(houseType, ["2009K1", "2009K2"])
+            .then(setPriceData)
+            .catch(console.error);
     }
 
     return (
