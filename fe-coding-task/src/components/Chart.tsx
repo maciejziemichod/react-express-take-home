@@ -8,7 +8,7 @@ type ChartProps = {
 };
 
 export function Chart({ xData, data, isLoading }: ChartProps) {
-    if (isLoading) {
+    if (isLoading || xData.length === 0 || data.length === 0) {
         return <CircularProgress />;
     }
 
