@@ -1,4 +1,4 @@
-import { Alert, CircularProgress } from "@mui/material";
+import { Alert, Box, CircularProgress } from "@mui/material";
 import { LineChart } from "@mui/x-charts";
 
 type ChartProps = {
@@ -8,12 +8,18 @@ type ChartProps = {
 };
 
 export function Chart({ xData, data, isLoading }: ChartProps) {
-    if (isLoading) {
-        return <CircularProgress />;
-    }
+    const height = 450;
 
     if (data.length === 0) {
-        return <Alert severity="info">Use form to display some data</Alert>;
+        return <Alert severity="info">Use form to display data</Alert>;
+    }
+
+    if (isLoading || xData.length !== data.length) {
+        return (
+            <Box height={height} display="flex" alignItems="center">
+                <CircularProgress />;
+            </Box>
+        );
     }
 
     return (
@@ -21,7 +27,11 @@ export function Chart({ xData, data, isLoading }: ChartProps) {
             xAxis={[
                 {
                     data: xData.map((_, i) => i),
-                    valueFormatter: (v) => xData[v],
+                    valueFormatter: (v) => {
+                        const value = xData[v];
+
+                        return value ? value : "";
+                    },
                 },
             ]}
             series={[
@@ -29,7 +39,7 @@ export function Chart({ xData, data, isLoading }: ChartProps) {
                     data,
                 },
             ]}
-            height={450}
+            height={height}
         />
     );
 }
