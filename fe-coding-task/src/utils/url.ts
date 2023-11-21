@@ -54,3 +54,7 @@ export function getParams(): Params {
 
     return params;
 }
+
+export function getRawParams(): string {
+    return new URLSearchParams(window.location.search).toString();
+}
