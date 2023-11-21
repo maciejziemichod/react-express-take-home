@@ -9,6 +9,7 @@ import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import { getFormFieldsData, queryData } from "./utils/api";
 import { getParams, updateParams } from "./utils/url";
+import { getQuartersRange } from "./utils/quarters";
 
 const darkTheme = createTheme({
     palette: {
@@ -17,15 +18,6 @@ const darkTheme = createTheme({
 });
 
 const sidebarWidth = 240;
-
-const dPricedata = [
-    24751, 25956, 27133, 26711, 28007, 28481, 29157, 28890, 30524, 31279, 32262,
-    31743, 33388, 34240, 35045, 34337, 36066, 36292, 36421, 34335, 35281, 36638,
-    37760, 36397, 39516, 40514, 41148, 39652, 41302, 43894, 45713, 45333, 47717,
-    47397, 46492, 44831, 45673, 47672, 47874, 46111, 47535, 49559, 49878, 48462,
-    49380, 50876, 52834, 52337, 55981, 56478, 56849, 54558, 59658, 60166, 60220,
-    56159, 58785, 61253, 60575,
-];
 
 export default function App() {
     const items: SavedStatItem[] = [
@@ -41,11 +33,13 @@ export default function App() {
         FormFields | undefined
     >(undefined);
     const [priceData, setPriceData] = useState<number[]>([]);
+    const [quartersData, setQuartersData] = useState<string[]>([]);
 
     useEffect(() => {
         getFormFieldsData()
             .then((data) => {
                 setFormFieldsData(data);
+
                 const { startQuarter, endQuarter, houseType } = getParams();
 
                 setFormFieldsValues({
@@ -53,19 +47,24 @@ export default function App() {
                     endQuarter: endQuarter ? endQuarter : "",
                     houseType: houseType ? houseType : "",
                 });
+
+                if (!startQuarter && !endQuarter && !houseType) {
+                    return;
+                }
+
+                const selectedQuarters = getQuartersRange(
+                    startQuarter,
+                    endQuarter,
+                    data.quarters,
+                );
+
+                updateData(selectedQuarters, houseType ? houseType : "");
             })
-            .catch((error) => {
-                console.error(error);
-            })
+            .catch(console.error)
             .finally(() => {
                 setIsLoading(false);
             });
     }, []);
-
-    let quarters: string[] =
-        formFieldsData === null
-            ? []
-            : formFieldsData.quarters.map(({ name }) => name);
 
     // TODO: secure from race conditions
     // https://react.dev/reference/react/useEffect#fetching-data-with-effects
@@ -73,20 +72,36 @@ export default function App() {
         console.log(key);
     }
 
+    // TODO: secure from race conditions
+    // https://react.dev/reference/react/useEffect#fetching-data-with-effects
     function handleFormSubmit({
         startQuarter,
         endQuarter,
         houseType,
-    }: FormFields) {
+    }: FormFields): void {
         updateParams({
             startQuarter: startQuarter,
             endQuarter: endQuarter,
             houseType: houseType,
         });
 
-        queryData(houseType, ["2009K1", "2009K2"])
-            .then(setPriceData)
-            .catch(console.error);
+        if (formFieldsData === null) {
+            return;
+        }
+
+        const selectedQuarters = getQuartersRange(
+            startQuarter,
+            endQuarter,
+            formFieldsData.quarters,
+        );
+
+        updateData(selectedQuarters, houseType);
+    }
+
+    function updateData(quarters: string[], houseType: string): void {
+        setQuartersData(quarters);
+
+        queryData(houseType, quarters).then(setPriceData).catch(console.error);
     }
 
     return (
@@ -114,7 +129,7 @@ export default function App() {
                     <Box display="flex" justifyContent="center" mt={4}>
                         <Chart
                             data={priceData}
-                            xData={quarters}
+                            xData={quartersData}
                             isLoading={false}
                         />
                     </Box>
