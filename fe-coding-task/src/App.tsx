@@ -20,11 +20,6 @@ const darkTheme = createTheme({
 const sidebarWidth = 240;
 
 export default function App() {
-    const items: SavedStatItem[] = [
-        { key: "aaa", name: "Aaa" },
-        { key: "baa", name: "Baa" },
-    ];
-
     const [isLoading, setIsLoading] = useState(true);
     const [formFieldsData, setFormFieldsData] = useState<FormFieldsData | null>(
         null,
@@ -66,14 +61,10 @@ export default function App() {
             });
     }, []);
 
-    // TODO: secure from race conditions
-    // https://react.dev/reference/react/useEffect#fetching-data-with-effects
     function handleSavedStatsClick(key: string) {
         console.log(key);
     }
 
-    // TODO: secure from race conditions
-    // https://react.dev/reference/react/useEffect#fetching-data-with-effects
     function handleFormSubmit({
         startQuarter,
         endQuarter,
@@ -99,9 +90,12 @@ export default function App() {
     }
 
     function updateData(quarters: string[], houseType: string): void {
-        setQuartersData(quarters);
-
-        queryData(houseType, quarters).then(setPriceData).catch(console.error);
+        queryData(houseType, quarters)
+            .then((data) => {
+                setQuartersData(quarters);
+                setPriceData(data);
+            })
+            .catch(console.error);
     }
 
     return (
@@ -110,7 +104,7 @@ export default function App() {
             <Box component="main" sx={{ display: { xs: "block", sm: "flex" } }}>
                 <Sidebar
                     sidebarWidth={sidebarWidth}
-                    items={items}
+                    items={[]}
                     onSavedStatsClick={handleSavedStatsClick}
                 />
                 <Box

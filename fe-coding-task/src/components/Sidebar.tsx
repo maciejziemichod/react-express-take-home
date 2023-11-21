@@ -7,6 +7,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import { SavedStatItem } from "../common/types";
+import { Typography } from "@mui/material";
 
 type SidebarProps = {
     sidebarWidth: number;
@@ -40,9 +41,11 @@ export function Sidebar({
                     ))
                 ) : (
                     <ListItem>
-                        <ListItemText>
-                            Add a comment to any displayed stats and it'll be
-                            automatically saved here for you
+                        <ListItemText color="grey">
+                            <Typography color="darkgray" fontSize={14}>
+                                Add a comment to any displayed stats and it'll
+                                be automatically saved here for you
+                            </Typography>
                         </ListItemText>
                     </ListItem>
                 )}
